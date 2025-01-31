@@ -113,7 +113,13 @@ bool Renderer::init(int width, int height) {
 
 void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
     // Clear the screen
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    int display_w, display_h;
+    glfwGetFramebufferSize(m_window, &display_w, &display_h);
+    glViewport(0, 0, display_w, display_h);
+    // std::cout<<"Display Width: "<<display_w<< " height: "<<display_h<<"\n";
+
 
     // Bind the texture and upload the frame data
     glBindTexture(GL_TEXTURE_2D, m_texture);
