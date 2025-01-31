@@ -1,2 +1,7 @@
 build/
+xbuild/
 .DS_Store
+ig/
+.idea/
+.vscode/
+cmake-build-debug/
