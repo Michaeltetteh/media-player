@@ -58,18 +58,13 @@ list(APPEND IMGUI_SRC
 )
 
 list(APPEND APP_SRC
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/video_decoder.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/audio_player.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/player.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/app.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/video_decoder.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/audio_player.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
 add_subdirectory(libs)
-
-
-
 
 add_executable(MediaPlayer ${IMGUI_SRC} ${APP_SRC})
 
@@ -80,7 +75,6 @@ set(CMAKE_BUILD_TYPE "Debug")
 target_compile_options(MediaPlayer PRIVATE -g)
 
 target_compile_definitions(MediaPlayer PRIVATE NDEBUG)
-
 
 FetchContent_MakeAvailable(glm glfw)
 target_link_libraries(MediaPlayer 

@@ -23,7 +23,7 @@ public:
     ~Renderer();
 
     bool init(int width, int height);
-    // void renderFrame(const uint8_t* frameData, int width, int height);
+    void renderFrame(const uint8_t* frameData, int width, int height);
     void render();
     void cleanup();
     GLFWwindow* getWindow() const { return m_window; }
@@ -31,7 +31,7 @@ public:
 
 private:
     GLFWwindow* m_window;
-    GLuint m_textureID;
+    GLuint m_texture;
     GLuint m_shaderProgram;
     GLuint VAO, VBO, EBO;
     ImVec4 m_clear_color = ImVec4(1.0f, 0.55f, 0.60f, 1.00f);

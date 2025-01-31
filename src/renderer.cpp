@@ -3,13 +3,14 @@
 
 const char* GLSL_VERSION;
 
-Renderer::Renderer() : m_window(nullptr), m_textureID(0), m_shaderProgram(0), VAO(0), VBO(0), EBO(0) {}
+Renderer::Renderer() : m_window(nullptr), m_texture(0), m_shaderProgram(0), VAO(0), VBO(0), EBO(0) {}
 
 Renderer::~Renderer() {
     cleanup();
 }
 
 bool Renderer::init(int width, int height) {
+    std::cout<<"width: "<<width<< "height: "<<height<<"\n";
     // Initialize GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW." << std::endl;
@@ -50,6 +51,7 @@ bool Renderer::init(int width, int height) {
 
     // Make the m_window's context current
     glfwMakeContextCurrent(m_window);
+    // glfwSwapInterval(1);  // Enable V-Sync
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -71,8 +73,8 @@ bool Renderer::init(int width, int height) {
     ImGui_ImplOpenGL3_Init(GLSL_VERSION);
 
     // Generate and bind the texture
-    glGenTextures(1, &m_textureID);
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    glGenTextures(1, &m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -109,42 +111,44 @@ bool Renderer::init(int width, int height) {
     return true;
 }
 
-// void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
-//     // Clear the screen
-//     glClear(GL_COLOR_BUFFER_BIT);
+void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
+    // Clear the screen
+    glClear(GL_COLOR_BUFFER_BIT);
 
-//     // Bind the texture and upload the frame data
-//     glBindTexture(GL_TEXTURE_2D, m_textureID);
-//     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, frameData);
+    // Bind the texture and upload the frame data
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, frameData);
 
-//     // Use the shader program and draw the quad
-//     glUseProgram(m_shaderProgram);
-//     glBindVertexArray(VAO);
-//     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // Use the shader program and draw the quad
+    glUseProgram(m_shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-//     // Render the ImGui UI
-//     renderUI();
+    // Render the ImGui UI
+    render();
 
-//     // Swap buffers
-//     glfwSwapBuffers(m_window);
-//     glfwPollEvents();
-// }
+    // Swap buffers
+    glfwSwapBuffers(m_window);
+    glfwPollEvents();
+}
 
 void Renderer::render() {
+    processInput();
     // Start a new ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    // Rendering
-    ImGui::Render();
-    int display_w, display_h;
-    glfwGetFramebufferSize(m_window, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
-    glClearColor(m_clear_color.x * m_clear_color.w, m_clear_color.y * m_clear_color.w, m_clear_color.z * m_clear_color.w, m_clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glfwSwapBuffers(m_window);
+    // ImGui_ImplOpenGL3_NewFrame();
+    // ImGui_ImplGlfw_NewFrame();
+    // ImGui::NewFrame();
+    //
+    // ImGui::Begin("Media Player Controls");
+    // ImGui::Text("Hello, world!");
+    // if (ImGui::Button("Play/Pause")) {
+    //     // Add play/pause logic here
+    // }
+    // ImGui::End();
+    //
+    // // Render ImGui
+    // ImGui::Render();
+    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void Renderer::cleanup() {
@@ -154,7 +158,7 @@ void Renderer::cleanup() {
     ImGui::DestroyContext();
 
     // Clean up OpenGL resources
-    glDeleteTextures(1, &m_textureID);
+    glDeleteTextures(1, &m_texture);
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
