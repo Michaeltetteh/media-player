@@ -28,6 +28,22 @@ find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
 
 set(CMAKE_CXX_STANDARD 17)
 
+#FFmpeg
+# Set FFmpeg paths
+set(FFMPEG_DIR "/usr/local/Cellar/ffmpeg/7.1_4")
+set(FFMPEG_INCLUDE_DIR "/usr/local/Cellar/ffmpeg/7.1_4/include")
+set(FFMPEG_LIB_DIR "/usr/local/Cellar/ffmpeg/7.1_4/lib")
+
+# Find FFmpeg libraries
+find_library(AVCODEC_LIBRARY avcodec PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVFORMAT_LIBRARY avformat PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVUTIL_LIBRARY avutil PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(SWSCALE_LIBRARY swscale PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVFILTER_LIBRARY avfilter PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVDEVICE_LIBRARY avdevice PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(SWRESAMPLE_LIBRARY swresample PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+
+
 list(APPEND IMGUI_SRC 
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends/imgui_impl_glfw.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends/imgui_impl_opengl3.cpp
@@ -50,19 +66,14 @@ list(APPEND APP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-# macro(copy_files files)
-#     foreach(file ${files})
-#         message(STATUS "Copying resource ${file}")
-#         file(COPY ${file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/shaders)
-#     endforeach()
-# endmacro()
-# copy_files(${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/)
-
 add_subdirectory(libs)
+
+
+
 
 add_executable(MediaPlayer ${IMGUI_SRC} ${APP_SRC})
 
-target_include_directories(MediaPlayer PRIVATE src libs)
+target_include_directories(MediaPlayer PRIVATE src libs ${FFMPEG_INCLUDE_DIR})
 
 # flag for debugging (Generate source-level debug information)
 set(CMAKE_BUILD_TYPE "Debug")
@@ -70,12 +81,19 @@ target_compile_options(MediaPlayer PRIVATE -g)
 
 target_compile_definitions(MediaPlayer PRIVATE NDEBUG)
 
-# SDL2::SDL2main may or may not be available. It is e.g. required by Windows GUI applications
-# if(TARGET SDL2::SDL2main)
-#     # It has an implicit dependency on SDL2 functions, so it MUST be added before SDL2::SDL2 (or SDL2::SDL2-static)
-#     target_link_libraries(MediaPlayer PRIVATE SDL2::SDL2main)
-# endif()
 
 FetchContent_MakeAvailable(glm glfw)
-# target_link_libraries(MediaPlayer FFmpeg glad glm glfw SDL2::SDL2main SDL2::SDL2)
-target_link_libraries(MediaPlayer glad glm glfw SDL2::SDL2main SDL2::SDL2)
+target_link_libraries(MediaPlayer 
+    ${AVCODEC_LIBRARY}
+    ${AVFORMAT_LIBRARY}
+    ${AVUTIL_LIBRARY}
+    ${SWSCALE_LIBRARY}
+    ${AVFILTER_LIBRARY}    
+    ${AVDEVICE_LIBRARY}
+    ${SWRESAMPLE_LIBRARY}
+    glad 
+    glm 
+    glfw 
+    SDL2::SDL2main 
+    SDL2::SDL2
+)
