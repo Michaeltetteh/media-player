@@ -1,22 +1,25 @@
 #pragma once
 
 extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-#include <libswresample/swresample.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/channel_layout.h>
-#include <libavutil/opt.h>
+    #include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libswscale/swscale.h>
+    #include <libswresample/swresample.h>
+    #include <libavutil/imgutils.h>
+    #include <libavutil/channel_layout.h>
+    #include <libavutil/opt.h>
 }
-
 #include <string>
 
 
 class MPDecoder {
+    
 public:
     MPDecoder();
     ~MPDecoder();
+    MPDecoder (const MPDecoder &) =delete;
+    MPDecoder (MPDecoder &&) =delete;
+    MPDecoder& operator=(const MPDecoder &) =delete;
 
     bool open(const std::string& filePath);
     void close();

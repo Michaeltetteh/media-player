@@ -98,7 +98,9 @@ bool Renderer::init(int width, int height) {
         out vec4 FragColor;
         uniform sampler2D texture1;
         void main() {
-            FragColor = texture(texture1, TexCoord);
+            #flips texture
+            vec2 flippedTexCoords = vec2(TexCoord.x, 1.0 - TexCoord.y);
+            FragColor = texture(texture1, flippedTexCoords);
         }
     )";
 
@@ -118,8 +120,6 @@ void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
     int display_w, display_h;
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
-    // std::cout<<"Display Width: "<<display_w<< " height: "<<display_h<<"\n";
-
 
     // Bind the texture and upload the frame data
     glBindTexture(GL_TEXTURE_2D, m_texture);
