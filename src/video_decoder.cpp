@@ -28,7 +28,8 @@ bool MPDecoder::open(const std::string& filePath) {
     }
 
     // Find video and audio streams
-    for (int i = 0; i < m_formatContext->nb_streams; i++) {
+    for (int i = 0; i < m_formatContext->nb_streams; i++) 
+    {
         if (m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && m_videoStreamIndex == -1) {
             m_videoStreamIndex = i;
         } else if (m_formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && m_audioStreamIndex == -1) {
@@ -102,29 +103,43 @@ void MPDecoder::close() {
 }
 
 bool MPDecoder::decodeFrame() {
-    while (av_read_frame(m_formatContext, m_packet) >= 0) {
-        if (m_packet->stream_index == m_videoStreamIndex) {
-            if (avcodec_send_packet(m_videoCodecContext, m_packet) == 0) {
-                if (avcodec_receive_frame(m_videoCodecContext, m_videoFrame) == 0) {
-                    sws_scale(m_swsContext, m_videoFrame->data, m_videoFrame->linesize, 0, m_videoCodecContext->height, m_rgbFrame->data, m_rgbFrame->linesize);
-                    av_packet_unref(m_packet);
-                    return true;
-                }
-            }
-        } else if (m_packet->stream_index == m_audioStreamIndex) {
-            if (avcodec_send_packet(m_audioCodecContext, m_packet) == 0) {
-                if (avcodec_receive_frame(m_audioCodecContext, m_audioFrame) == 0) {
+    while (av_read_frame(m_formatContext, m_packet) >= 0) 
+    {
+        if (m_packet->stream_index == m_videoStreamIndex) 
+        {
+            if (avcodec_send_packet(m_videoCodecContext, m_packet) == 0) 
+            {
+                int ret = avcodec_receive_frame(m_videoCodecContext, m_videoFrame);
+                if (ret == 0) 
+                {
+                    sws_scale(
+                        m_swsContext, 
+                        m_videoFrame->data, 
+                        m_videoFrame->linesize, 
+                        0, 
+                        m_videoCodecContext->height, 
+                        m_rgbFrame->data, 
+                        m_rgbFrame->linesize
+                    );
                     av_packet_unref(m_packet);
                     return true;
                 }
             }
         }
+        //  else if (m_packet->stream_index == m_audioStreamIndex) {
+        //     if (avcodec_send_packet(m_audioCodecContext, m_packet) == 0) {
+        //         if (avcodec_receive_frame(m_audioCodecContext, m_audioFrame) == 0) {
+        //             av_packet_unref(m_packet);
+        //             return true;
+        //         }
+        //     }
+        // }
         av_packet_unref(m_packet);
     }
     return false;
 }
 
-AVFrame* MPDecoder::getVideoFrame() const {
+AVFrame* MPDecoder::getVideoFrame() const{
     return m_rgbFrame;
 }
 
@@ -150,6 +165,10 @@ int MPDecoder::getAudioChannels() const {
 
 AVSampleFormat MPDecoder::getAudioFormat() const {
     return m_audioCodecContext->sample_fmt;
+}
+
+AVRational MPDecoder::getFrameRate() const {
+    return m_formatContext->streams[m_videoStreamIndex]->avg_frame_rate;
 }
 
 void MPDecoder::initSWSContext() {

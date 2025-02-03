@@ -6,6 +6,9 @@
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <chrono>
+#include <thread>
+#include <map>
 
 
 static void glfw_error_callback(int error, const char* description);
@@ -23,7 +26,7 @@ public:
     ~Renderer();
 
     bool init(int width, int height);
-    void renderFrame(const uint8_t* frameData, int width, int height);
+    void renderFrame(const uint8_t* frameData, int width, int height,  double frameDelay=0.0f);
     void render();
     void cleanup();
     GLFWwindow* getWindow() const { return m_window; }
@@ -35,7 +38,7 @@ private:
     GLuint m_shaderProgram;
     GLuint VAO, VBO, EBO;
     ImVec4 m_clear_color = ImVec4(1.0f, 0.55f, 0.60f, 1.00f);
-
+    
     GLuint compileShader(const std::string& source, GLenum type);
     GLuint createShaderProgram(const std::string& vertexSource, const std::string& fragmentSource);
     void setupQuad();

@@ -113,7 +113,7 @@ bool Renderer::init(int width, int height) {
     return true;
 }
 
-void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
+void Renderer::renderFrame(const uint8_t* frameData, int width, int height, double frameDelay) {
     // Clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -136,6 +136,9 @@ void Renderer::renderFrame(const uint8_t* frameData, int width, int height) {
     // Swap buffers
     glfwSwapBuffers(m_window);
     glfwPollEvents();
+
+    std::cout<<"frameDelay: "<<frameDelay<<std::endl;
+    std::this_thread::sleep_for(std::chrono::duration<double>(frameDelay));
 }
 
 void Renderer::render() {

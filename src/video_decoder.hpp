@@ -31,6 +31,7 @@ public:
     int getAudioSampleRate() const;
     int getAudioChannels() const;
     AVSampleFormat getAudioFormat() const;
+    AVRational getFrameRate() const;
 
 private:
     AVFormatContext* m_formatContext;
