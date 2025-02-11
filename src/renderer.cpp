@@ -3,7 +3,7 @@
 
 const char* GLSL_VERSION;
 
-Renderer::Renderer() : m_window(nullptr), m_texture(0), m_shaderProgram(0), VAO(0), VBO(0), EBO(0) {}
+Renderer::Renderer() : m_window(nullptr), m_texture(0), m_shader(nullptr), VAO(0), VBO(0), EBO(0) {}
 
 Renderer::~Renderer() {
     cleanup();
@@ -80,33 +80,10 @@ bool Renderer::init(int width, int height) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // Define the vertex and fragment shaders
-    const char* vertexShaderSource = R"(
-        #version 330 core
-        layout(location = 0) in vec3 aPos;
-        layout(location = 1) in vec2 aTexCoord;
-        out vec2 TexCoord;
-        void main() {
-            gl_Position = vec4(aPos, 1.0);
-            TexCoord = aTexCoord;
-        }
-    )";
-
-    const char* fragmentShaderSource = R"(
-        #version 330 core
-        in vec2 TexCoord;
-        out vec4 FragColor;
-        uniform sampler2D texture1;
-        void main() {
-            //flips texture
-            vec2 flippedTexCoords = vec2(TexCoord.x, 1.0 - TexCoord.y);
-            FragColor = texture(texture1, flippedTexCoords);
-        }
-    )";
-
     // Create the shader program
-    m_shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-
+    m_shader = new Shader(
+        "resource/shaders/vertex_shader.glsl",
+        "resource/shaders/fragment_shader.glsl");
     // Set up the quad for rendering
     setupQuad();
 
@@ -126,7 +103,7 @@ void Renderer::renderFrame(const uint8_t* frameData, int width, int height, doub
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, frameData);
 
     // Use the shader program and draw the quad
-    glUseProgram(m_shaderProgram);
+    m_shader->use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -171,7 +148,7 @@ void Renderer::cleanup() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteProgram(m_shaderProgram);
+    delete m_shader;
 
     // Destroy the m_window and terminate GLFW
     if (m_window) {
@@ -181,50 +158,50 @@ void Renderer::cleanup() {
     glfwTerminate();
 }
 
-GLuint Renderer::compileShader(const std::string& source, GLenum type) {
-    GLuint shader = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
+// GLuint Renderer::compileShader(const std::string& source, GLenum type) {
+//     GLuint shader = glCreateShader(type);
+//     const char* src = source.c_str();
+//     glShaderSource(shader, 1, &src, nullptr);
+//     glCompileShader(shader);
 
-    // Check for shader compile errors
-    GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        std::cerr << "Shader compilation failed: " << infoLog << std::endl;
-    }
+//     // Check for shader compile errors
+//     GLint success;
+//     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+//     if (!success) {
+//         char infoLog[512];
+//         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+//         std::cerr << "Shader compilation failed: " << infoLog << std::endl;
+//     }
 
-    return shader;
-}
+//     return shader;
+// }
 
-GLuint Renderer::createShaderProgram(const std::string& vertexSource, const std::string& fragmentSource) {
-    // Compile the vertex and fragment shaders
-    GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
-    GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
+// GLuint Renderer::createShaderProgram(const std::string& vertexSource, const std::string& fragmentSource) {
+//     // Compile the vertex and fragment shaders
+//     GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
+//     GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
 
-    // Link the shaders into a program
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
+//     // Link the shaders into a program
+//     GLuint program = glCreateProgram();
+//     glAttachShader(program, vertexShader);
+//     glAttachShader(program, fragmentShader);
+//     glLinkProgram(program);
 
-    // Check for linking errors
-    GLint success;
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(program, 512, nullptr, infoLog);
-        std::cerr << "Shader program linking failed: " << infoLog << std::endl;
-    }
+//     // Check for linking errors
+//     GLint success;
+//     glGetProgramiv(program, GL_LINK_STATUS, &success);
+//     if (!success) {
+//         char infoLog[512];
+//         glGetProgramInfoLog(program, 512, nullptr, infoLog);
+//         std::cerr << "Shader program linking failed: " << infoLog << std::endl;
+//     }
 
-    // Delete the shaders as they're linked into the program now
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+//     // Delete the shaders as they're linked into the program now
+//     glDeleteShader(vertexShader);
+//     glDeleteShader(fragmentShader);
 
-    return program;
-}
+//     return program;
+// }
 
 void Renderer::setupQuad() {
     // Define the vertices and texture coordinates for a full-screen quad

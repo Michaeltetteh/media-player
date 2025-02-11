@@ -9,6 +9,7 @@
 #include <chrono>
 #include <thread>
 #include <map>
+#include "shader.hpp"
 
 
 static void glfw_error_callback(int error, const char* description);
@@ -35,12 +36,9 @@ public:
 private:
     GLFWwindow* m_window;
     GLuint m_texture;
-    GLuint m_shaderProgram;
     GLuint VAO, VBO, EBO;
-    ImVec4 m_clear_color = ImVec4(1.0f, 0.55f, 0.60f, 1.00f);
-    
-    GLuint compileShader(const std::string& source, GLenum type);
-    GLuint createShaderProgram(const std::string& vertexSource, const std::string& fragmentSource);
+    Shader* m_shader;
+
     void setupQuad();
 
 };

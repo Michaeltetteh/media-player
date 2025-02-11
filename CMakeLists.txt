@@ -4,6 +4,7 @@ project(MediaPlayer)
 
 include(FetchContent)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 FetchContent_Declare(glfw
     GIT_REPOSITORY "https://github.com/glfw/glfw"
@@ -60,9 +61,22 @@ list(APPEND IMGUI_SRC
 list(APPEND APP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/video_decoder.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/audio_player.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/shader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
+
+#macro to copy resource file to build dir
+macro(copy_resources dirs)
+    foreach(dir ${dirs})
+        string(REGEX REPLACE "/+$" "" dirclean "${dir}")
+        message(STATUS "Copying resource ${dirclean}")
+        file(COPY ${dirclean} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/)
+    endforeach()
+endmacro()
+
+copy_resources(resource/)
+
 
 add_subdirectory(libs)
 

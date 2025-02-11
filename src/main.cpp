@@ -9,7 +9,7 @@ int main() {
     Renderer renderer;
     AudioPlayer audioPlayer;
 
-    if (!decoder.open("video.mp4")) {
+    if (!decoder.open("resource/vid.mkv")) {
         std::cerr << "Failed to open media file.\n";
         return -1;
     }
