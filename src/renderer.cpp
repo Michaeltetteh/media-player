@@ -158,51 +158,6 @@ void Renderer::cleanup() {
     glfwTerminate();
 }
 
-// GLuint Renderer::compileShader(const std::string& source, GLenum type) {
-//     GLuint shader = glCreateShader(type);
-//     const char* src = source.c_str();
-//     glShaderSource(shader, 1, &src, nullptr);
-//     glCompileShader(shader);
-
-//     // Check for shader compile errors
-//     GLint success;
-//     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-//     if (!success) {
-//         char infoLog[512];
-//         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-//         std::cerr << "Shader compilation failed: " << infoLog << std::endl;
-//     }
-
-//     return shader;
-// }
-
-// GLuint Renderer::createShaderProgram(const std::string& vertexSource, const std::string& fragmentSource) {
-//     // Compile the vertex and fragment shaders
-//     GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
-//     GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
-
-//     // Link the shaders into a program
-//     GLuint program = glCreateProgram();
-//     glAttachShader(program, vertexShader);
-//     glAttachShader(program, fragmentShader);
-//     glLinkProgram(program);
-
-//     // Check for linking errors
-//     GLint success;
-//     glGetProgramiv(program, GL_LINK_STATUS, &success);
-//     if (!success) {
-//         char infoLog[512];
-//         glGetProgramInfoLog(program, 512, nullptr, infoLog);
-//         std::cerr << "Shader program linking failed: " << infoLog << std::endl;
-//     }
-
-//     // Delete the shaders as they're linked into the program now
-//     glDeleteShader(vertexShader);
-//     glDeleteShader(fragmentShader);
-
-//     return program;
-// }
-
 void Renderer::setupQuad() {
     // Define the vertices and texture coordinates for a full-screen quad
     float vertices[] = {
