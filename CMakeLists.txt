@@ -25,7 +25,7 @@ set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 find_package(SDL2 REQUIRED CONFIG REQUIRED COMPONENTS SDL2)
 
 find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
-
+find_package(OpenAL REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -82,7 +82,7 @@ add_subdirectory(libs)
 
 add_executable(MediaPlayer ${IMGUI_SRC} ${APP_SRC})
 
-target_include_directories(MediaPlayer PRIVATE src libs ${FFMPEG_INCLUDE_DIR})
+target_include_directories(MediaPlayer PRIVATE src libs ${FFMPEG_INCLUDE_DIR} ${OPENAL_INCLUDE_DIR})
 
 # flag for debugging (Generate source-level debug information)
 set(CMAKE_BUILD_TYPE "Debug")
@@ -104,4 +104,5 @@ target_link_libraries(MediaPlayer
     glfw 
     SDL2::SDL2main 
     SDL2::SDL2
+    ${OPENAL_LIBRARY}
 )

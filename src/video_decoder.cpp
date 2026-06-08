@@ -105,20 +105,20 @@ void MPDecoder::close() {
 bool MPDecoder::decodeFrame() {
     while (av_read_frame(m_formatContext, m_packet) >= 0) 
     {
-        if (m_packet->stream_index == m_videoStreamIndex) 
+        if (m_packet->stream_index == m_videoStreamIndex)
         {
-            if (avcodec_send_packet(m_videoCodecContext, m_packet) == 0) 
+            if (avcodec_send_packet(m_videoCodecContext, m_packet) == 0)
             {
                 int ret = avcodec_receive_frame(m_videoCodecContext, m_videoFrame);
-                if (ret == 0) 
+                if (ret == 0)
                 {
                     sws_scale(
-                        m_swsContext, 
-                        m_videoFrame->data, 
-                        m_videoFrame->linesize, 
-                        0, 
-                        m_videoCodecContext->height, 
-                        m_rgbFrame->data, 
+                        m_swsContext,
+                        m_videoFrame->data,
+                        m_videoFrame->linesize,
+                        0,
+                        m_videoCodecContext->height,
+                        m_rgbFrame->data,
                         m_rgbFrame->linesize
                     );
                     av_packet_unref(m_packet);
